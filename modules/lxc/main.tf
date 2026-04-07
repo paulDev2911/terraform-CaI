@@ -64,11 +64,11 @@ resource "terraform_data" "salt_bootstrap" {
   depends_on = [proxmox_virtual_environment_container.lxc]
 
   connection {
-    type     = "ssh"
-    host     = split("/", var.ip)[0]
-    user     = "root"
-    password = var.root_password
-    timeout  = "3m"
+    type        = "ssh"
+    host        = split("/", var.ip)[0]
+    user        = "root"
+    private_key = file("~/.ssh/homelab")
+    timeout     = "3m"
   }
 
   provisioner "remote-exec" {
