@@ -8,7 +8,7 @@ lxc_template      = "local:vztmpl/debian-12-standard_12.12-1_amd64.tar.zst"
 lxc_root_password = "admin"
 ssh_public_key    = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIGUihOPXuJCwmHLvkivJQUbk0G3RKE/AyxTzXFqnstA homelab"
 
-salt_master_ip    = "192.168.2.11"
+salt_master_ip    = "192.168.2.100"
 gateway           = "192.168.2.1"
 dns_server        = "1.1.1.1"
 
