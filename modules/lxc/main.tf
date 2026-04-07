@@ -1,3 +1,10 @@
+terraform {
+  required_providers {
+    proxmox = {
+      source = "bpg/proxmox"
+    }
+  }
+}
 resource "proxmox_virtual_environment_container" "lxc" {
   node_name    = var.node
   vm_id        = var.vmid
