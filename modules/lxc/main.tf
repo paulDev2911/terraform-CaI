@@ -32,10 +32,17 @@ resource "proxmox_virtual_environment_container" "lxc" {
     }
   }
 
-  cpu     { cores = var.cores }
-  memory  { dedicated = var.memory_mb ; swap = 512 }
-  disk    { datastore_id = var.storage_pool ; size = var.disk_gb }
+cpu    { cores = var.cores }
 
+  memory {
+    dedicated = var.memory_mb
+    swap      = 512
+  }
+
+disk {
+    datastore_id = var.storage_pool
+    size         = var.disk_gb
+  }
   network_interface {
     name   = "eth0"
     bridge = "vmbr0"
