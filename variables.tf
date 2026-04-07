@@ -2,12 +2,12 @@ variable "proxmox_endpoint" {
   type = string
 }
 
-variable "proxmox_username" {
-  type    = string
-  default = "root@pam"
+variable "proxmox_token_id" {
+  type      = string
+  sensitive = true
 }
 
-variable "proxmox_password" {
+variable "proxmox_token_secret" {
   type      = string
   sensitive = true
 }
