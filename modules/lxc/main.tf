@@ -90,7 +90,7 @@ resource "terraform_data" "salt_bootstrap" {
       # Salt installieren
       "until apt-get update -qq; do sleep 5; done",
       "apt-get install -y -qq curl",
-      "curl -fsSL https://bootstrap.saltproject.io -o /tmp/bootstrap_salt.sh",
+      "curl -fsSL https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh -o /tmp/bootstrap_salt.sh",
 
       var.role == "master"
         ? "sh /tmp/bootstrap_salt.sh -M stable"
