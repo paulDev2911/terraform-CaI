@@ -44,7 +44,7 @@ locals {
     "proxy" = {
       role      = "minion"
       vmid      = 114
-      ip        = "192.168.1.104/24"
+      ip        = "192.168.2.104/24"
       cores     = 1
       memory_mb = 512
       disk_gb   = 8
