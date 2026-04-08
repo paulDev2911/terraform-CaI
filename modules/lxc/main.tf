@@ -98,7 +98,7 @@ resource "terraform_data" "salt_bootstrap" {
 
       # Master: auto_accept + master config
       var.role == "master"
-        ? "mkdir -p /etc/salt && printf 'auto_accept: True\n' > /etc/salt/master"
+        ? "mkdir -p /etc/salt && printf 'auto_accept: True\n' > /etc/salt/master && systemctl restart salt-master"
         : "echo 'minion, skipping master config'",
 
       # Minion: master IP + minion ID
