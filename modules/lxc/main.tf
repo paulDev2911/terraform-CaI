@@ -96,15 +96,27 @@ resource "terraform_data" "salt_bootstrap" {
         ? "sh /tmp/bootstrap_salt.sh -M stable"
         : "sh /tmp/bootstrap_salt.sh stable",
 
+      # Master: auto_accept + master config
+      var.role == "master"
+        ? "mkdir -p /etc/salt && printf 'auto_accept: True\n' > /etc/salt/master"
+        : "echo 'minion, skipping master config'",
+
+      # Minion: master IP + minion ID
       var.role == "minion"
         ? "mkdir -p /etc/salt && printf 'master: ${var.salt_master_ip}\nid: ${var.name}\n' > /etc/salt/minion"
         : "echo 'master, skipping minion config'",
 
+      # Services starten
       var.role == "master"
         ? "systemctl enable --now salt-master"
         : "systemctl enable --now salt-minion",
 
-      # Temp key aus authorized_keys rausschmeissen
+      # Minion: kurz warten dann nochmal restarten damit Master-Verbindung klappt
+      var.role == "minion"
+        ? "sleep 10 && systemctl restart salt-minion"
+        : "echo 'master, skipping minion restart'",
+
+      # Temp key rausschmeissen
       "TEMP_PUB='${trimspace(tls_private_key.temp.public_key_openssh)}'",
       "grep -v \"$TEMP_PUB\" ~/.ssh/authorized_keys > /tmp/ak_clean && mv /tmp/ak_clean ~/.ssh/authorized_keys",
       "echo 'temp key removed'",
