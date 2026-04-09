@@ -24,7 +24,7 @@ resource "proxmox_virtual_environment_container" "lxc" {
 
   operating_system {
     template_file_id = var.template
-    type             = "debian"
+    type             = var.os_type
   }
 
   initialization {
@@ -86,22 +86,60 @@ resource "terraform_data" "salt_bootstrap" {
   }
 
   provisioner "remote-exec" {
-    inline = [
+    inline = var.os_type == "alpine" ? [
+
+      # Alpine Bootstrap
+      "until apk update -q; do sleep 5; done",
+      "apk add -q curl bash",
+
       # Salt installieren
+      var.role == "master"
+        ? "apk add -q salt-master"
+        : "apk add -q salt-minion",
+
+      # Master config
+      var.role == "master"
+        ? "mkdir -p /etc/salt && printf 'auto_accept: True\n' > /etc/salt/master && rc-service salt-master restart"
+        : "echo 'minion, skipping master config'",
+
+      # Minion config
+      var.role == "minion"
+        ? "mkdir -p /etc/salt && printf 'master: ${var.salt_master_ip}\nid: ${var.name}\n' > /etc/salt/minion"
+        : "echo 'master, skipping minion config'",
+
+      # Services aktivieren
+      var.role == "master"
+        ? "rc-update add salt-master default && rc-service salt-master start"
+        : "rc-update add salt-minion default && rc-service salt-minion start",
+
+      # Minion restart
+      var.role == "minion"
+        ? "sleep 10 && rc-service salt-minion restart"
+        : "echo 'master, skipping minion restart'",
+
+      # Temp key rausschmeissen
+      "TEMP_PUB='${trimspace(tls_private_key.temp.public_key_openssh)}'",
+      "grep -v \"$TEMP_PUB\" ~/.ssh/authorized_keys > /tmp/ak_clean && mv /tmp/ak_clean ~/.ssh/authorized_keys",
+      "echo 'temp key removed'",
+
+    ] : [
+
+      # Debian Bootstrap
       "until apt-get update -qq; do sleep 5; done",
       "apt-get install -y -qq curl",
-      "curl -fsSL https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh -o /tmp/bootstrap_salt.sh",
 
+      # Salt installieren
+      "curl -fsSL https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh -o /tmp/bootstrap_salt.sh",
       var.role == "master"
         ? "sh /tmp/bootstrap_salt.sh -M stable"
         : "sh /tmp/bootstrap_salt.sh stable",
 
-      # Master: auto_accept + master config
+      # Master config
       var.role == "master"
         ? "mkdir -p /etc/salt && printf 'auto_accept: True\n' > /etc/salt/master && systemctl restart salt-master"
         : "echo 'minion, skipping master config'",
 
-      # Minion: master IP + minion ID
+      # Minion config
       var.role == "minion"
         ? "mkdir -p /etc/salt && printf 'master: ${var.salt_master_ip}\nid: ${var.name}\n' > /etc/salt/minion"
         : "echo 'master, skipping minion config'",
@@ -111,7 +149,7 @@ resource "terraform_data" "salt_bootstrap" {
         ? "systemctl enable --now salt-master"
         : "systemctl enable --now salt-minion",
 
-      # Minion: kurz warten dann nochmal restarten damit Master-Verbindung klappt
+      # Minion restart
       var.role == "minion"
         ? "sleep 10 && systemctl restart salt-minion"
         : "echo 'master, skipping minion restart'",
@@ -120,6 +158,7 @@ resource "terraform_data" "salt_bootstrap" {
       "TEMP_PUB='${trimspace(tls_private_key.temp.public_key_openssh)}'",
       "grep -v \"$TEMP_PUB\" ~/.ssh/authorized_keys > /tmp/ak_clean && mv /tmp/ak_clean ~/.ssh/authorized_keys",
       "echo 'temp key removed'",
+
     ]
   }
 }

@@ -2,6 +2,7 @@ locals {
   containers = {
 
     "master" = {
+      node      = null
       role      = "master"
       vmid      = 110
       ip        = "192.168.2.100/24"
@@ -10,9 +11,11 @@ locals {
       disk_gb   = 16
       tags      = ["salt", "infra"]
       template  = null
+      os_type   = "debian"
     }
 
     "media" = {
+      node      = null
       role      = "minion"
       vmid      = 111
       ip        = "192.168.2.101/24"
@@ -21,9 +24,11 @@ locals {
       disk_gb   = 32
       tags      = ["media", "minion"]
       template  = null
+      os_type   = "debian"
     }
 
     "docs" = {
+      node      = null
       role      = "minion"
       vmid      = 112
       ip        = "192.168.2.102/24"
@@ -32,9 +37,11 @@ locals {
       disk_gb   = 16
       tags      = ["docs", "minion"]
       template  = null
+      os_type   = "debian"
     }
 
     "vault" = {
+      node      = null
       role      = "minion"
       vmid      = 113
       ip        = "192.168.2.103/24"
@@ -43,9 +50,11 @@ locals {
       disk_gb   = 8
       tags      = ["vault", "minion"]
       template  = "local:vztmpl/alpine-3.21-default_20241217_amd64.tar.xz"
+      os_type   = "alpine"
     }
 
     "proxy" = {
+      node      = null
       role      = "minion"
       vmid      = 114
       ip        = "192.168.2.104/24"
@@ -54,6 +63,7 @@ locals {
       disk_gb   = 8
       tags      = ["proxy", "minion"]
       template  = null
+      os_type   = "debian"
     }
 
   }
@@ -75,8 +85,9 @@ module "lxc" {
   memory_mb      = each.value.memory_mb
   disk_gb        = each.value.disk_gb
   tags           = each.value.tags
-  node           = var.proxmox_node
+  node           = each.value.node != null ? each.value.node : var.proxmox_node
   template       = each.value.template != null ? each.value.template : var.lxc_template
+  os_type        = each.value.os_type
   root_password  = var.lxc_root_password
   ssh_public_key = var.ssh_public_key
   storage_pool   = var.storage_pool

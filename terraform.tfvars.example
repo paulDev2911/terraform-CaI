@@ -1,10 +1,10 @@
-proxmox_endpoint  = "https://192.168.1.10:8006"
-proxmox_username  = "root@pam"
-proxmox_password  = "changeme"
-proxmox_insecure  = true
-proxmox_node      = "pve"
+proxmox_endpoint     = "https://192.168.1.10:8006"
+proxmox_token_id     = "root@pam!terraform"
+proxmox_token_secret = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+proxmox_insecure     = true
+proxmox_node         = "pve"
 
-lxc_template      = "local:vztmpl/debian-12-standard_12.7-1_amd64.tar.zst"
+lxc_template      = "local:vztmpl/debian-12-standard_12.12-1_amd64.tar.zst"
 lxc_root_password = "changeme"
 ssh_public_key    = "ssh-ed25519 AAAA... you@host"
 

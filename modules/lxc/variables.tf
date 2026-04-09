@@ -1,8 +1,6 @@
 variable "name"           { type = string }
 variable "vmid"           { type = number }
 variable "role"           { type = string }
-variable "node"           { type = string }
-variable "template"       { type = string }
 variable "ip"             { type = string }
 variable "gateway"        { type = string }
 variable "dns_server"     { type = string }
@@ -11,9 +9,19 @@ variable "root_password"  { type = string }
 variable "ssh_public_key" { type = string }
 variable "salt_master_ip" { type = string }
 
+variable "node" {
+  type    = string
+  default = null
+}
+
 variable "template" {
   type    = string
   default = null
+}
+
+variable "os_type" {
+  type    = string
+  default = "debian"
 }
 
 variable "cores" {
