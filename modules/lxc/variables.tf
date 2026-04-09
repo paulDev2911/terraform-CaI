@@ -11,6 +11,11 @@ variable "root_password"  { type = string }
 variable "ssh_public_key" { type = string }
 variable "salt_master_ip" { type = string }
 
+variable "template" {
+  type    = string
+  default = null
+}
+
 variable "cores" {
   type    = number
   default = 2

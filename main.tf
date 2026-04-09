@@ -9,6 +9,7 @@ locals {
       memory_mb = 1024
       disk_gb   = 16
       tags      = ["salt", "infra"]
+      template  = null
     }
 
     "media" = {
@@ -19,6 +20,7 @@ locals {
       memory_mb = 4096
       disk_gb   = 32
       tags      = ["media", "minion"]
+      template  = null
     }
 
     "docs" = {
@@ -29,6 +31,7 @@ locals {
       memory_mb = 2048
       disk_gb   = 16
       tags      = ["docs", "minion"]
+      template  = null
     }
 
     "vault" = {
@@ -39,6 +42,7 @@ locals {
       memory_mb = 512
       disk_gb   = 8
       tags      = ["vault", "minion"]
+      template  = "local:vztmpl/alpine-3.21-default_20241217_amd64.tar.xz"
     }
 
     "proxy" = {
@@ -49,6 +53,7 @@ locals {
       memory_mb = 512
       disk_gb   = 8
       tags      = ["proxy", "minion"]
+      template  = null
     }
 
   }
@@ -71,7 +76,7 @@ module "lxc" {
   disk_gb        = each.value.disk_gb
   tags           = each.value.tags
   node           = var.proxmox_node
-  template       = var.lxc_template
+  template       = each.value.template != null ? each.value.template : var.lxc_template
   root_password  = var.lxc_root_password
   ssh_public_key = var.ssh_public_key
   storage_pool   = var.storage_pool
