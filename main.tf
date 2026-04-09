@@ -49,8 +49,8 @@ locals {
       memory_mb = 512
       disk_gb   = 8
       tags      = ["vault", "minion"]
-      template  = "local:vztmpl/alpine-3.21-default_20241217_amd64.tar.xz"
-      os_type   = "alpine"
+      template  = null
+      os_type   = "debian"
     }
 
     "proxy" = {
